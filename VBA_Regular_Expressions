@@ -15,12 +15,15 @@ With New RegExp
     If .Test(strInput) Then
         For Each rMatch In .Execute(strInput)
             ReDim Preserve arrayMatches(i)
+            'to avoid errors later in case there are spaces.
             arrayMatches(i) = Replace(rMatch.Value, " ", "")
             i = i + 1
-            's = s & " " & rMatch
+            
         Next
     End If
 End With
+
+'returning a list of the regex matches joined with a space
 
 RegexMatches = Join(arrayMatches, " ")
 
