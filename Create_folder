@@ -1,0 +1,43 @@
+Sub createfolder()
+
+Dim Currentfile As String
+Dim Currentsheet As String
+
+Currentfile = ActiveWorkbook.Name
+
+'input box to log
+ID = InputBox("Your ID")
+QC_Password.Show
+PW = QC_Password.TextBox1.Value
+QC_Password.Hide
+Set objShell = CreateObject("WScript.Shell")
+Set tdc = CreateObject("TDApiOle80.TDConnection")
+tdc.InitConnectionEx "https://YOUR_QC_LINK.com/qcbin/"
+
+Application.StatusBar = "Connecting to Quality Center.. Wait..."
+
+'detail your domain, project, ID, PW
+tdc.ConnectProjectEx "DOMAIN", "PROJECT", ID, PW
+
+'erase password from memory
+Unload QC_Password
+
+Application.StatusBar = "........QC Connection is done Successfully"
+
+
+
+Set treemgr = tdc.TestSetTreeManager
+
+'Loop through the lines fro your excels, which countains the links/paths to create the folders and the name of the folders
+
+For i = 2 To 22
+    Link = Workbooks(Currentfile).Worksheets("Template_QC_Create_Folders").Cells(i, 6)
+    Title = Workbooks(Currentfile).Worksheets("Template_QC_Create_Folders").Cells(i, 1)
+    Set Root = treemgr.NodeByPath(Link)
+    Set subfolder1 = Root.AddNode(Title)
+        
+    subfolder1.Post
+    
+Next i
+
+End Sub
