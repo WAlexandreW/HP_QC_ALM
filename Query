@@ -111,6 +111,7 @@ For Z = LBound(releases_list) To UBound(releases_list)
             .Interior.ColorIndex = 15
         End With
         
+        
         .Cells(1, 1) = "Comment"
         .Cells(1, 2) = "Competence Area"
         .Cells(1, 3) = "Fault Report ID"
