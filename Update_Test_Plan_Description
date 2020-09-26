@@ -1,0 +1,81 @@
+Sub Update_test_Lab()
+
+Dim Currentfile As String
+Dim Currentsheet As String
+
+Dim td As New TDConnection
+Dim rng As Range
+ 
+ 
+'to facilitate manipulations
+Currentfile = ActiveWorkbook.Name
+Currentsheet = ActiveSheet.Name
+ 
+'column countaining test instance Ids
+Set rng = Workbooks(Currentfile).Worksheets("Upload To QC").Range("N3:N" & Lines) ' & Lines)
+
+'the last line in the excel sheet countaining the IDs of the items
+Lines = Workbooks(Currentfile).Worksheets("Upload To QC").Range("N100000").End(xlUp).row
+
+''''
+'input box to log
+ID = InputBox("Your ID")
+QC_Password.Show
+PW = QC_Password.TextBox1.Value
+QC_Password.Hide
+Set objShell = CreateObject("WScript.Shell")
+Set tdc = CreateObject("TDApiOle80.TDConnection")
+tdc.InitConnectionEx "https://YOUR_QC_LINK.com/qcbin/"
+
+Application.StatusBar = "Connecting to Quality Center.. Wait..."
+
+'detail your domain, project, ID, PW
+tdc.ConnectProjectEx "DOMAIN", "PROJECT", ID, PW
+
+'erase password from memory
+Unload QC_Password
+
+Application.StatusBar = "........QC Connection is done Successfully"
+
+
+
+vchrono = Now()
+
+Dim tfact As TestFactory
+Dim mytest As Test
+         
+Set tfact = td.TestFactory
+
+'for each cell value in the IDs area
+
+For Each t In rng
+    'select the item
+    Set mytest = tfact.Item(t)
+   ' take the new description which is on the right column next to the IDs 
+    text = t.Offset(0, 1)
+    
+    Substitute_description = text
+    
+    mytest.Field("TS_DESCRIPTION") = Substitute_description
+    
+    mytest.Post
+Next
+
+
+Set tfact = Nothing
+
+td.Logout
+td.Disconnect
+td.ReleaseConnection
+Set td = Nothing
+
+
+vchrono = Now() - vchrono
+MsgBox "QC Export Finished!" & _
+vbCr & Round(vchrono * 86400, 0) & " Seconds, i.e " & Round((vchrono * 86400) / 60, 1) & " minutes."
+
+
+
+
+
+End Sub
