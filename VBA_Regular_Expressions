@@ -1,0 +1,27 @@
+Function RegexMatches(strInput As String) As String
+
+Dim rMatch As Object
+Dim s As String
+Dim arrayMatches()
+Dim i As Long
+
+With New RegExp
+    .Global = True
+    .MultiLine = True
+    .IgnoreCase = True
+    'insert the regex pattern you want here
+    .Pattern = "Topic n°\s?\d{5}\d?"
+    
+    If .Test(strInput) Then
+        For Each rMatch In .Execute(strInput)
+            ReDim Preserve arrayMatches(i)
+            arrayMatches(i) = Replace(rMatch.Value, " ", "")
+            i = i + 1
+            's = s & " " & rMatch
+        Next
+    End If
+End With
+
+RegexMatches = Join(arrayMatches, " ")
+
+End Function
