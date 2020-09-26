@@ -1,0 +1,111 @@
+'This is a function to keep the formatting in QC Description
+'there are several sources about this code and i am not the author. 
+'I prefered to copy it as the original is quite well hidden in Internet
+
+
+Function fnConvert2HTML(myCell As Range) As String
+    Dim bldTagOn, itlTagOn, ulnTagOn, colTagOn As Boolean
+    Dim i, chrCount As Integer
+    Dim chrCol, chrLastCol, htmlTxt As String
+    
+    bldTagOn = False
+    itlTagOn = False
+    ulnTagOn = False
+    colTagOn = False
+    chrCol = "NONE"
+    htmlTxt = "<html>"
+    chrCount = myCell.Characters.Count
+    
+    For i = 1 To chrCount
+        With myCell.Characters(i, 1)
+            If (.Font.Color) Then
+                chrCol = fnGetCol(.Font.Color)
+                If Not colTagOn Then
+                    htmlTxt = htmlTxt & "<font color=#" & chrCol & ">"
+                    colTagOn = True
+                Else
+                    If chrCol <> chrLastCol Then htmlTxt = htmlTxt & "</font><font color=#" & chrCol & ">"
+                End If
+            Else
+                chrCol = "NONE"
+                If colTagOn Then
+                    htmlTxt = htmlTxt & "</font>"
+                    colTagOn = False
+                End If
+            End If
+            chrLastCol = chrCol
+            
+            If .Font.Bold = True Then
+                If Not bldTagOn Then
+                    htmlTxt = htmlTxt & "<b>"
+                    bldTagOn = True
+                End If
+            Else
+                If bldTagOn Then
+                    htmlTxt = htmlTxt & "</b>"
+                    bldTagOn = False
+                End If
+            End If
+    
+            If .Font.Italic = True Then
+                If Not itlTagOn Then
+                    htmlTxt = htmlTxt & "<i>"
+                    itlTagOn = True
+                End If
+            Else
+                If itlTagOn Then
+                    htmlTxt = htmlTxt & "</i>"
+                    itlTagOn = False
+                End If
+            End If
+    
+            If .Font.Underline > 0 Then
+                If Not ulnTagOn Then
+                    htmlTxt = htmlTxt & "<u>"
+                    ulnTagOn = True
+                End If
+            Else
+                If ulnTagOn Then
+                    htmlTxt = htmlTxt & "</u>"
+                    ulnTagOn = False
+                End If
+            End If
+            
+            If (Asc(.text) = 10) Then
+                htmlTxt = htmlTxt & "<br>"
+            Else
+                htmlTxt = htmlTxt & .text
+            End If
+        End With
+    Next
+    
+    If colTagOn Then
+        htmlTxt = htmlTxt & "</font>"
+        colTagOn = False
+    End If
+    If bldTagOn Then
+        htmlTxt = htmlTxt & "</b>"
+        bldTagOn = False
+    End If
+    If itlTagOn Then
+        htmlTxt = htmlTxt & "</i>"
+        itlTagOn = False
+    End If
+    If ulnTagOn Then
+        htmlTxt = htmlTxt & "</u>"
+        ulnTagOn = False
+    End If
+    htmlTxt = htmlTxt & "</html>"
+    fnConvert2HTML = htmlTxt
+End Function
+
+Function fnGetCol(strCol As String) As String
+    Dim rVal, gVal, bVal As String
+    strCol = Right("000000" & Hex(strCol), 6)
+    bVal = Left(strCol, 2)
+    gVal = Mid(strCol, 3, 2)
+    rVal = Right(strCol, 2)
+    fnGetCol = rVal & gVal & bVal
+End Function
+
+
